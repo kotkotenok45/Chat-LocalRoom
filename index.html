@@ -3,182 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LAN Mesh Core</title>
-    <link rel="stylesheet" href="https://cloudflare.com">
+    <title>LAN Mesh PWA</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <script src="https://unpkg.com"></script>
+    <script src="https://cloudflare.com"></script>
     <style>
-        :root {
-            --bg: linear-gradient(135deg, #090d16 0%, #111827 100%);
-            --panel: rgba(30, 41, 59, 0.7);
-            --border: rgba(255, 255, 255, 0.08);
-            --cyan: #06b6d4;
-            --green: #10b981;
-            --white: #f8fafc;
-            --gray: #94a3b8;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
-        body { background: var(--bg); color: var(--white); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
-        .app-container { width: 100%; max-width: 400px; background: var(--panel); backdrop-filter: blur(16px); border: 1px solid var(--border); border-radius: 24px; padding: 25px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
-        h1 { font-size: 24px; font-weight: 800; text-align: center; background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .subtitle { color: var(--gray); text-align: center; font-size: 13px; margin: 5px 0 25px; }
-        .action-btn { width: 100%; padding: 16px; border-radius: 14px; border: none; font-size: 15px; font-weight: 600; color: white; cursor: pointer; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.2s; }
-        .action-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
-        .btn-host { background: linear-gradient(135deg, #047857, #10b981); box-shadow: 0 6px 15px -4px rgba(16,185,129,0.3); }
-        .btn-join { background: linear-gradient(135deg, #0e7490, #06b6d4); box-shadow: 0 6px 15px -4px rgba(6,182,212,0.3); }
-        .view-layer { display: none; }
-        .view-layer.active { display: block; animation: slideUp 0.3s ease out; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .radar-box { position: relative; width: 120px; height: 120px; margin: 30px auto; }
-        .radar-wave { position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: 1.5px solid var(--cyan); border-radius: 50%; animation: pulse 1.8s infinite linear; opacity: 0; }
-        .radar-wave:nth-child(2) { animation-delay: 0.6s; }
-        .radar-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 32px; }
-        @keyframes pulse { 0% { transform: scale(0.1); opacity: 1; } 100% { transform: scale(1.2); opacity: 0; } }
-        .node-card { background: rgba(15,23,42,0.6); border: 1px solid var(--border); padding: 15px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; margin-top: 15px; }
-        .node-card:hover { border-color: var(--cyan); }
-        .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); }
-        .chat-space { display: flex; flex-direction: column; height: 350px; }
-        .chat-stream { flex: 1; overflow-y: auto; padding-right: 4px; margin: 15px 0; display: flex; flex-direction: column; gap: 10px; }
-        .chat-stream::-webkit-scrollbar { width: 4px; }
-        .chat-stream::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
-        .bubble { max-width: 80%; padding: 10px 14px; border-radius: 14px; font-size: 14px; line-height: 1.4; word-break: break-word; }
-        .bubble.in { background: #334155; align-self: flex-start; border-bottom-left-radius: 4px; }
-        .bubble.out { background: linear-gradient(135deg, #0891b2, #06b6d4); align-self: flex-end; border-bottom-right-radius: 4px; }
-        .input-dock { display: flex; gap: 8px; }
-        .input-field { flex: 1; background: rgba(15,23,42,0.8); border: 1px solid var(--border); padding: 14px; border-radius: 12px; color: white; font-size: 14px; outline: none; }
-        .input-field:focus { border-color: var(--cyan); }
-        .btn-send { background: var(--cyan); border: none; width: 48px; border-radius: 12px; color: white; cursor: pointer; font-size: 16px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background: #0f172a; color: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .box { width: 100%; max-width: 400px; background: #1e293b; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h2 { text-align: center; margin-bottom: 20px; }
+        .btn { width: 100%; padding: 15px; border-radius: 12px; border: none; font-size: 15px; font-weight: bold; color: white; cursor: pointer; margin-bottom: 10px; }
+        .btn-green { background: #10b981; }
+        .btn-blue { background: #3b82f6; }
+        .view { display: none; }
+        .view.active { display: block; }
+        .input { width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 10px; color: white; margin-bottom: 15px; outline: none; }
+        .radar { width: 80px; height: 80px; border: 2px dashed #3b82f6; border-radius: 50%; margin: 20px auto; animation: spin 4s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .card { background: #0f172a; padding: 15px; border-radius: 12px; cursor: pointer; text-align: center; margin-top: 15px; }
+        .chat-area { height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; padding-right: 5px; }
+        .msg { max-width: 80%; padding: 10px 14px; border-radius: 12px; font-size: 14px; word-break: break-word; }
+        .msg.in { background: #334155; align-self: flex-start; }
+        .msg.out { background: #3b82f6; align-self: flex-end; }
+        .footer { font-size: 12px; text-align: center; color: #94a3b8; }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    
+<div class="box">
     <!-- ЭКРАН 1: МЕНЮ -->
-    <div id="view-home" class="view-layer active">
-        <h1>LAN Mesh Core</h1>
-        <p class="subtitle">Локальная P2P среда чата</p>
-        <button class="action-btn btn-host" onclick="initHost()"><i class="fa-solid fa-server"></i> Создать сервер</button>
-        <button class="action-btn btn-join" onclick="initSearch()"><i class="fa-solid fa-satellite-dish"></i> Найти серверы</button>
+    <div id="v-home" class="view active">
+        <h2>LAN Mesh Core</h2>
+        <input type="password" id="pass" class="input" placeholder="Пароль шифрования (опционально)">
+        <button class="btn btn-green" onclick="goHost()">Создать сервер</button>
+        <button class="btn btn-blue" onclick="goSearch()">Найти серверы</button>
     </div>
 
-    <!-- ЭКРАН 2: СЕРВЕР ОЖИДАЕТ -->
-    <div id="view-host" class="view-layer">
-        <h1>Сервер запущен</h1>
-        <p class="subtitle" id="host-ip">Проводка локального шлюза...</p>
-        <div class="radar-box">
-            <div class="radar-wave" style="border-color:var(--green)"></div>
-            <div class="radar-wave" style="border-color:var(--green)"></div>
-            <div class="radar-center">🖥️</div>
-        </div>
-        <p style="text-align:center; font-size:14px; font-weight:600;" id="pin-display">Код: ...</p>
+    <!-- ЭКРАН 2: ОЖИДАНИЕ -->
+    <div id="v-host" class="view">
+        <h2>Сервер запущен</h2>
+        <div class="radar" style="border-color:#10b981;"></div>
+        <p id="crypto-status" style="text-align:center; margin-bottom:10px;">Защита отключена</p>
+        <p class="footer">Ожидайте автоматического подключения...</p>
     </div>
 
-    <!-- ЭКРАН 3: ПОИСК (РАДАР) -->
-    <div id="view-search" class="view-layer">
-        <h1>Сканирование сети</h1>
-        <p class="subtitle">Опрос узлов подсети Wi-Fi...</p>
-        <div id="search-pulse" class="radar-box">
-            <div class="radar-wave"></div>
-            <div class="radar-wave"></div>
-            <div class="radar-center">📡</div>
-        </div>
-        <div id="search-grid" style="display:none;">
-            <p style="font-size:11px; color:var(--gray); font-weight:600;">ОБНАРУЖЕН ШЛЮЗ:</p>
-            <div class="node-card" onclick="connectWithPin()">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <div class="dot"></div>
-                    <div>
-                        <div style="font-weight:700; font-size:14px;">Локальный чат-сервер</div>
-                        <div style="font-size:12px; color:var(--gray);" id="node-ip">IP: 192.168.1.45</div>
-                    </div>
-                </div>
-                <span style="color:var(--cyan); font-weight:700; font-size:12px;">ПОДКЛЮЧИТЬСЯ</span>
+    <!-- ЭКРАН 3: ПОИСК -->
+    <div id="v-search" class="view">
+        <h2>Поиск сети...</h2>
+        <div id="pulse" class="radar"></div>
+        <div id="result" style="display:none;">
+            <div class="card" onclick="connect()">
+                <strong>Общий LAN канал</strong><br>
+                <span style="font-size:12px; color:#94a3b8;">Нажмите для входа</span>
             </div>
         </div>
     </div>
 
     <!-- ЭКРАН 4: ЧАТ -->
-    <div id="view-chat" class="view-layer">
-        <div style="display:flex; align-items:center; gap:10px; padding-bottom:12px; border-bottom:1px solid var(--border);">
-            <div class="dot"></div>
-            <div>
-                <div style="font-weight:700; font-size:14px;" id="chat-title">Шлюз связи</div>
-                <div style="font-size:11px; color:var(--gray);">Прямой P2P защищенный канал</div>
-            </div>
-        </div>
-        <div class="chat-space">
-            <div class="chat-stream" id="chat-box"></div>
-            <div class="input-dock">
-                <input type="text" id="msg-input" class="input-field" placeholder="Сообщение..." onkeypress="checkKey(event)">
-                <button class="btn-send" onclick="send()"><i class="fa-solid fa-paper-plane"></i></button>
-            </div>
+    <div id="v-chat" class="view">
+        <h3 id="chat-title" style="margin-bottom:15px; padding-bottom:5px; border-bottom:1px solid #334155;">Чат</h3>
+        <div class="chat-area" id="box"></div>
+        <div style="display:flex; gap:10px;">
+            <input type="text" id="msg" class="input" style="margin:0;" placeholder="Сообщение..." onkeypress="if(event.key==='Enter')send()">
+            <button class="btn btn-blue" style="width:60px; margin:0;" onclick="send()">➔</button>
         </div>
     </div>
-
 </div>
 
 <script>
-    let peer = null, conn = null, pin = "";
+    const ROOM = "lan-mesh-pwa-auto-v4";
+    let peer = null, conn = null, key = "";
 
-    function view(id) {
-        document.querySelectorAll('.view-layer').forEach(l => l.classList.remove('active'));
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(e => console.log(e));
+    }
+
+    function show(id) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         document.getElementById(id).classList.add('active');
     }
 
-    function initHost() {
-        view('view-host');
-        pin = String(Math.floor(1000 + Math.random() * 9000));
-        peer = new Peer("mesh-pin-" + pin);
-        peer.on('open', () => {
-            document.getElementById('host-ip').innerText = `Виртуальный IP: 192.168.1.${Math.floor(Math.random()*250+2)}`;
-            document.getElementById('pin-display').innerHTML = `Код подключения:<br><span style="font-size:24px; color:var(--green);">${pin}</span>`;
+    function goHost() {
+        show('v-host');
+        key = document.getElementById('pass').value.trim();
+        if(key) document.getElementById('crypto-status').innerText = "🔒 Комната зашифрована";
+        
+        peer = new Peer(ROOM);
+        peer.on('connection', c => { 
+            conn = c; 
+            setTimeout(() => conn.send({ handshake: true, secure: key !== "" }), 500);
+            initChat("Клиент"); 
         });
-        peer.on('connection', c => { conn = c; startChat("Клиент"); });
+        peer.on('error', () => { alert("Сервер уже занят другим устройством."); location.reload(); });
     }
 
-    function initSearch() {
-        view('view-search');
+    function goSearch() {
+        show('v-search');
         setTimeout(() => {
-            document.getElementById('search-pulse').style.display = 'none';
-            document.getElementById('search-grid').style.display = 'block';
-            document.getElementById('node-ip').innerText = `IP: 192.168.1.${Math.floor(Math.random()*200+10)} (Ping: 3ms)`;
+            document.getElementById('pulse').style.display = 'none';
+            document.getElementById('result').style.display = 'block';
         }, 1500);
     }
 
-    function connectWithPin() {
-        let p = prompt("Введите 4-значный код сервера:");
-        if (!p) return;
+    function connect() {
         peer = new Peer();
         peer.on('open', () => {
-            conn = peer.connect("mesh-pin-" + p.trim());
-            conn.on('open', () => startChat("Сервер"));
-            conn.on('error', () => { alert("Ошибка подключения!"); location.reload(); });
+            conn = peer.connect(ROOM);
+            conn.on('open', () => initChat("Сервер"));
+            conn.on('error', () => { alert("Ошибка шлюза"); location.reload(); });
         });
     }
 
-    function startChat(name) {
-        view('view-chat');
-        document.getElementById('chat-title').innerText = name;
-        conn.on('data', d => msg(d, 'in'));
-        conn.on('close', () => { alert("Связь оборвана"); location.reload(); });
+    function initChat(title) {
+        show('v-chat');
+        document.getElementById('chat-title').innerText = title;
+        conn.on('data', data => {
+            if (data && data.handshake) {
+                if (data.secure) key = prompt("Введите пароль от этой комнаты:");
+                return;
+            }
+            let txt = data;
+            if (key) {
+                try {
+                    let bytes = CryptoJS.AES.decrypt(data, key);
+                    txt = bytes.toString(CryptoJS.enc.Utf8);
+                    if(!txt) throw new Error();
+                } catch(e) { txt = "🚨 [Ошибка расшифровки]"; }
+            }
+            print(txt, 'in');
+        });
+        conn.on('close', () => { alert("Отключено"); location.reload(); });
     }
 
     function send() {
-        let i = document.getElementById('msg-input'), t = i.value.trim();
+        let i = document.getElementById('msg'), t = i.value.trim();
         if (!t || !conn) return;
-        conn.send(t);
-        msg(t, 'out');
+        let p = key ? CryptoJS.AES.encrypt(t, key).toString() : t;
+        conn.send(p);
+        print(t, 'out');
         i.value = '';
     }
 
-    function msg(t, dir) {
-        let b = document.getElementById('chat-box'), d = document.createElement('div');
-        d.className = `bubble ${dir}`; d.innerText = t;
-        b.appendChild(d); b.scrollTop = b.scrollHeight;
+    function print(t, d) {
+        let b = document.getElementById('box'), m = document.createElement('div');
+        m.className = `msg ${d}`; m.innerText = t;
+        b.appendChild(m); b.scrollTop = b.scrollHeight;
     }
-
-    function checkKey(e) { if (e.key === 'Enter') send(); }
 </script>
 </body>
-          </html>
-          
+</html>
